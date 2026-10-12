@@ -5,9 +5,12 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 ## Funktionen
 
 - Interaktive Karte auf Basis von [Leaflet](https://leafletjs.com/)
+- Zwischen OpenStreetMap-Straßenkarte und Google-Satellitenansicht umschalten
 - Spots direkt per Kartenklick anlegen
 - Name und Beschreibung pro Spot
 - Gerichtete Pfeile zwischen zwei Spots spannen
+- Pfeilspitzen mit gut sichtbaren, doppelt langen Schenkeln
+- Marker- und Pfeilfarbe frei über Farbwähler einstellen
 - Spots und Pfeile dauerhaft in SQLite speichern
 - Einträge über die Seitenleiste verwalten und löschen
 - Keine externen Python-Abhängigkeiten erforderlich

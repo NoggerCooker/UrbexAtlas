@@ -1,10 +1,15 @@
 const map = L.map('map').setView([51.1657, 10.4515], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'});
+const satelliteTiles = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google'});
+osmTiles.addTo(map);
 const layers = {markers: new Map(), arrows: new Map()};
 let data = {spots: [], arrows: []};
 let addMode = false, arrowMode = false, arrowStart = null, pendingCoords = null;
+let markerColor = localStorage.getItem('urbexatlas-marker-color') || '#d86b3f';
+let arrowColor = localStorage.getItem('urbexatlas-arrow-color') || '#d86b3f';
 const $ = id => document.getElementById(id);
-const spotIcon = L.divIcon({className: 'spot-marker', iconSize: [16,16], iconAnchor: [8,8]});
+function makeSpotIcon() { return L.divIcon({className: 'spot-marker', html: `<span style="background:${markerColor}"></span>`, iconSize: [16,16], iconAnchor: [8,8]}); }
+function setTileLayer(layer, activeButton) { map.eachLayer(item => { if (item === osmTiles || item === satelliteTiles) map.removeLayer(item); }); layer.addTo(map); document.querySelectorAll('.map-btn').forEach(button => button.classList.remove('active')); activeButton.classList.add('active'); }
 
 async function api(path, options = {}) {
   const res = await fetch(path, {headers: {'Content-Type': 'application/json'}, ...options});
@@ -26,15 +31,15 @@ function render() {
   for (const item of layers.arrows.values()) { item.line.remove(); item.decorator?.remove(); }
   layers.markers.clear(); layers.arrows.clear();
   data.spots.forEach(spot => {
-    const marker = L.marker([spot.latitude, spot.longitude], {icon: spotIcon}).addTo(map);
+    const marker = L.marker([spot.latitude, spot.longitude], {icon: makeSpotIcon()}).addTo(map);
     marker.bindPopup(`<strong>${esc(spot.name)}</strong><br><small>${esc(spot.description || 'Keine Beschreibung')}</small><br><small>${spot.latitude.toFixed(5)}, ${spot.longitude.toFixed(5)}</small>`);
     marker.on('click', () => { if (arrowMode) chooseArrowSpot(spot); });
     layers.markers.set(spot.id, marker);
   });
   data.arrows.forEach(arrow => {
     const from = spotById(arrow.from_spot_id), to = spotById(arrow.to_spot_id); if (!from || !to) return;
-    const line = L.polyline([[from.latitude, from.longitude], [to.latitude, to.longitude]], {color:'#d86b3f', weight:3, opacity:.85}).addTo(map);
-    let decorator; if (L.polylineDecorator) decorator = L.polylineDecorator(line, {patterns:[{offset:'100%', repeat:0, symbol:L.Symbol.arrowHead({pixelSize:11, polygon:false, pathOptions:{stroke:true, color:'#d86b3f', weight:3}})}]}).addTo(map);
+    const line = L.polyline([[from.latitude, from.longitude], [to.latitude, to.longitude]], {color:arrowColor, weight:3, opacity:.85}).addTo(map);
+    let decorator; if (L.polylineDecorator) decorator = L.polylineDecorator(line, {patterns:[{offset:'100%', repeat:0, symbol:L.Symbol.arrowHead({pixelSize:22, polygon:false, pathOptions:{stroke:true, color:arrowColor, weight:3}})}]}).addTo(map);
     layers.arrows.set(arrow.id, {line, decorator});
   });
   $('spotCount').textContent = data.spots.length; $('arrowCount').textContent = data.arrows.length;
@@ -51,4 +56,9 @@ $('spotForm').addEventListener('submit', async e => { e.preventDefault(); const 
 $('spotForm').addEventListener('close', () => setMode(null));
 $('spotList').addEventListener('click', async e => { const id = e.target.dataset.deleteSpot; if (id && confirm('Spot und seine Pfeile löschen?')) { await api(`/api/spots/${id}`, {method:'DELETE'}); reload(); } });
 $('arrowList').addEventListener('click', async e => { const id = e.target.dataset.deleteArrow; if (id && confirm('Pfeil löschen?')) { await api(`/api/arrows/${id}`, {method:'DELETE'}); reload(); } });
+$('osmBtn').onclick = () => setTileLayer(osmTiles, $('osmBtn'));
+$('satelliteBtn').onclick = () => setTileLayer(satelliteTiles, $('satelliteBtn'));
+$('markerColor').value = markerColor; $('arrowColor').value = arrowColor;
+$('markerColor').addEventListener('input', e => { markerColor = e.target.value; localStorage.setItem('urbexatlas-marker-color', markerColor); render(); });
+$('arrowColor').addEventListener('input', e => { arrowColor = e.target.value; localStorage.setItem('urbexatlas-arrow-color', arrowColor); render(); });
 reload().catch(() => { $('statusText').textContent = 'Backend nicht erreichbar'; document.querySelector('.dot').style.background = '#d86b3f'; });

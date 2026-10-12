@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>New Lost Place Map</title>
+  <title>UrbexAtlas</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="/styles.css">
 </head>
@@ -20,6 +20,7 @@
         <button id="arrowModeBtn">➜ Pfeil spannen</button>
       </div>
       <div id="hint" class="hint">Klicke auf „Spot markieren“, dann auf einen Punkt der Karte.</div>
+      <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn active" type="button">Straße</button><button id="satelliteBtn" class="map-btn" type="button">Satellit</button></div><div class="color-row"><label for="markerColor">Markerfarbe</label><input id="markerColor" type="color" value="#d86b3f" title="Markerfarbe wählen"></div><div class="color-row"><label for="arrowColor">Pfeilfarbe</label><input id="arrowColor" type="color" value="#d86b3f" title="Pfeilfarbe wählen"></div></section>
       <section><div class="section-title"><span>Spots</span><strong id="spotCount">0</strong></div><div id="spotList" class="list empty">Noch keine Spots angelegt.</div></section>
       <section><div class="section-title"><span>Pfeile</span><strong id="arrowCount">0</strong></div><div id="arrowList" class="list empty">Noch keine Verbindungen angelegt.</div></section>
     </aside>
