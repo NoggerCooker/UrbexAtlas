@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Lost Place Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="eyebrow">URBEX ATLAS</span><h1>New Lost Place Map</h1></div>
+    <div class="status"><span class="dot"></span><span id="statusText">Verbunden</span></div>
+  </header>
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="intro"><h2>Spots verbinden</h2><p>Setze Marker auf der Karte und verbinde sie mit gerichteten Pfeilen.</p></section>
+      <div class="actions">
+        <button id="addSpotBtn" class="primary">＋ Spot markieren</button>
+        <button id="arrowModeBtn">➜ Pfeil spannen</button>
+      </div>
+      <div id="hint" class="hint">Klicke auf „Spot markieren“, dann auf einen Punkt der Karte.</div>
+      <section><div class="section-title"><span>Spots</span><strong id="spotCount">0</strong></div><div id="spotList" class="list empty">Noch keine Spots angelegt.</div></section>
+      <section><div class="section-title"><span>Pfeile</span><strong id="arrowCount">0</strong></div><div id="arrowList" class="list empty">Noch keine Verbindungen angelegt.</div></section>
+    </aside>
+    <div id="map"></div>
+  </main>
+  <dialog id="spotDialog"><form method="dialog" id="spotForm"><div class="dialog-head"><h2>Neuen Spot anlegen</h2><button value="cancel" class="close">×</button></div><p class="coords" id="coords"></p><label>Name<input name="name" required maxlength="100" placeholder="z. B. Alte Fabrik"></label><label>Beschreibung<textarea name="description" rows="3" maxlength="500" placeholder="Was ist dort zu sehen?"></textarea></label><div class="dialog-actions"><button value="cancel">Abbrechen</button><button class="primary" value="default">Speichern</button></div></form></dialog>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js" crossorigin=""></script>
+  <script src="/app.js"></script>
+</body>
+</html>
