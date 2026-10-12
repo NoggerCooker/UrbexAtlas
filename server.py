@@ -46,6 +46,15 @@ def init_db():
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(from_spot_id, to_spot_id)
             );
+            CREATE TABLE IF NOT EXISTS labels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL,
+                color TEXT NOT NULL DEFAULT '#ffffff',
+                font_size INTEGER NOT NULL DEFAULT 16,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
         for table in ("spots", "arrows"):
@@ -82,6 +91,13 @@ def color(value):
     return value
 
 
+def font_size(value):
+    value = int(value)
+    if not 10 <= value <= 72:
+        raise ValueError("font_size must be between 10 and 72")
+    return value
+
+
 class Handler(BaseHTTPRequestHandler):
     def send_json(self, payload, status=200):
         raw = json.dumps(payload, ensure_ascii=False).encode()
@@ -95,7 +111,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/api/data":
-            self.send_json({"spots": rows("SELECT * FROM spots ORDER BY id"), "arrows": rows("SELECT * FROM arrows ORDER BY id")})
+            self.send_json({"spots": rows("SELECT * FROM spots ORDER BY id"), "arrows": rows("SELECT * FROM arrows ORDER BY id"), "labels": rows("SELECT * FROM labels ORDER BY id")})
+            return
+        if path == "/api/labels":
+            self.send_json(rows("SELECT * FROM labels ORDER BY id"))
             return
         if path.startswith("/api/"):
             self.send_json({"error": "not found"}, 404)
@@ -153,6 +172,17 @@ class Handler(BaseHTTPRequestHandler):
                     arrow = dict(db.execute("SELECT * FROM arrows WHERE id = ?", (cursor.lastrowid,)).fetchone())
                     self.send_json(arrow, 201)
                     return
+                if path == "/api/labels":
+                    text = str(data.get("text", "")).strip()
+                    if not text:
+                        raise ValueError("text is required")
+                    cursor = db.execute(
+                        "INSERT INTO labels (text, latitude, longitude, color, font_size) VALUES (?, ?, ?, ?, ?)",
+                        (text[:300], number(data["latitude"], "latitude"), number(data["longitude"], "longitude"), color(data.get("color", "#ffffff")), font_size(data.get("font_size", 16))),
+                    )
+                    label = dict(db.execute("SELECT * FROM labels WHERE id = ?", (cursor.lastrowid,)).fetchone())
+                    self.send_json(label, 201)
+                    return
                 raise KeyError(path)
         except sqlite3.IntegrityError as exc:
             self.send_json({"error": "This arrow already exists or references an unknown spot."}, 409)
@@ -163,26 +193,42 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         try:
             item_id = int(path.rsplit("/", 1)[1])
-            table = "spots" if path.startswith("/api/spots/") else "arrows" if path.startswith("/api/arrows/") else None
-            if not table:
-                raise KeyError(path)
             data = body_json(self)
-            new_color = color(data["color"])
             with connect() as db:
+                if path.startswith("/api/labels/"):
+                    current = db.execute("SELECT * FROM labels WHERE id = ?", (item_id,)).fetchone()
+                    if not current:
+                        self.send_json({"error": "not found"}, 404)
+                        return
+                    updates = {
+                        "text": str(data.get("text", current["text"])).strip()[:300],
+                        "latitude": number(data.get("latitude", current["latitude"]), "latitude"),
+                        "longitude": number(data.get("longitude", current["longitude"]), "longitude"),
+                        "color": color(data.get("color", current["color"])),
+                        "font_size": font_size(data.get("font_size", current["font_size"])),
+                    }
+                    if not updates["text"]:
+                        raise ValueError("text is required")
+                    db.execute("UPDATE labels SET text = ?, latitude = ?, longitude = ?, color = ?, font_size = ? WHERE id = ?", (*updates.values(), item_id))
+                    self.send_json(dict(db.execute("SELECT * FROM labels WHERE id = ?", (item_id,)).fetchone()))
+                    return
+                table = "spots" if path.startswith("/api/spots/") else "arrows" if path.startswith("/api/arrows/") else None
+                if not table:
+                    raise KeyError(path)
+                new_color = color(data["color"])
                 cursor = db.execute(f"UPDATE {table} SET color = ? WHERE id = ?", (new_color, item_id))
                 if cursor.rowcount == 0:
                     self.send_json({"error": "not found"}, 404)
                 else:
-                    item = dict(db.execute(f"SELECT * FROM {table} WHERE id = ?", (item_id,)).fetchone())
-                    self.send_json(item)
+                    self.send_json(dict(db.execute(f"SELECT * FROM {table} WHERE id = ?", (item_id,)).fetchone()))
         except (KeyError, ValueError, TypeError, json.JSONDecodeError):
-            self.send_json({"error": "invalid color or item"}, 400)
+            self.send_json({"error": "invalid label, color or item"}, 400)
 
     def do_DELETE(self):
         path = urlparse(self.path).path
         try:
             item_id = int(path.rsplit("/", 1)[1])
-            table = "spots" if path.startswith("/api/spots/") else "arrows" if path.startswith("/api/arrows/") else None
+            table = "spots" if path.startswith("/api/spots/") else "arrows" if path.startswith("/api/arrows/") else "labels" if path.startswith("/api/labels/") else None
             if not table:
                 raise KeyError(path)
             with connect() as db:

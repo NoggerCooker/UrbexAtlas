@@ -9,6 +9,9 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 - Zwischen OpenStreetMap-Straßenkarte und Google-Satellitenansicht umschalten
 - Mobile Ansicht mit ausklappbarer Seitenleiste
 - Spots direkt per Kartenklick anlegen
+- Schwebende Beschriftungen an geografischen Positionen platzieren
+- Beschriftungen per Drag-and-drop verschieben und per Klick bearbeiten
+- Textfarbe und Textgröße pro Beschriftung einstellen
 - Name und Beschreibung pro Spot
 - Gerichtete Pfeile zwischen zwei Spots spannen
 - Pfeilspitzen mit gut sichtbaren, doppelt langen Schenkeln
@@ -54,10 +57,14 @@ PORT=9000 python3 server.py
 1. **Spot markieren** auswählen.
 2. Auf die gewünschte Position der Karte klicken.
 3. Namen und optional eine Beschreibung eingeben.
-4. Für eine Verbindung **Pfeil spannen** auswählen.
-5. Zuerst den Startspot, danach den Zielspot anklicken.
+4. Für eine Beschriftung **Beschriftung setzen** auswählen.
+5. Auf die gewünschte Kartenposition klicken, Text, Farbe und Größe eingeben.
+6. Für eine Verbindung **Pfeil spannen** auswählen.
+7. Zuerst den Startspot, danach den Zielspot anklicken.
 
-Die Datenbank `lost_place_map.sqlite3` wird beim ersten Start automatisch mit den Tabellen `spots` und `arrows` angelegt.
+Beschriftungen lassen sich direkt auf der Karte verschieben. Ein Klick auf den Text öffnet den Bearbeitungsdialog. Alle Beschriftungen werden in der SQLite-Tabelle `labels` gespeichert.
+
+Die Datenbank `lost_place_map.sqlite3` wird beim ersten Start automatisch mit den Tabellen `spots`, `arrows` und `labels` angelegt.
 
 ## Mobile Bedienung
 
@@ -81,6 +88,10 @@ UrbexAtlas/
 - `GET /api/data` – alle Spots und Pfeile laden
 - `POST /api/spots` – Spot anlegen
 - `POST /api/arrows` – Pfeil zwischen zwei Spots anlegen
+- `GET /api/labels` – Beschriftungen laden
+- `POST /api/labels` – Beschriftung anlegen
+- `PATCH /api/labels/<id>` – Text, Position, Farbe oder Größe ändern
+- `DELETE /api/labels/<id>` – Beschriftung löschen
 - `PATCH /api/spots/<id>` – Markerfarbe eines Spots speichern
 - `PATCH /api/arrows/<id>` – Pfeilfarbe eines Pfeils speichern
 - `DELETE /api/spots/<id>` – Spot inklusive abhängiger Pfeile löschen

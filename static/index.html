@@ -18,16 +18,19 @@
       <section class="intro"><h2>Spots verbinden</h2><p>Setze Marker auf der Karte und verbinde sie mit gerichteten Pfeilen.</p></section>
       <div class="actions">
         <button id="addSpotBtn" class="primary">＋ Spot markieren</button>
+        <button id="addLabelBtn">T Beschriftung setzen</button>
         <button id="arrowModeBtn">➜ Pfeil spannen</button>
       </div>
       <div id="hint" class="hint">Klicke auf „Spot markieren“, dann auf einen Punkt der Karte.</div>
       <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn" type="button">Straße</button><button id="satelliteBtn" class="map-btn active" type="button">Satellit</button></div></section>
       <section><div class="section-title"><span>Spots</span><strong id="spotCount">0</strong></div><div id="spotList" class="list empty">Noch keine Spots angelegt.</div></section>
+      <section><div class="section-title"><span>Beschriftungen</span><strong id="labelCount">0</strong></div><div id="labelList" class="list empty">Noch keine Beschriftungen angelegt.</div></section>
       <section><div class="section-title"><span>Pfeile</span><strong id="arrowCount">0</strong></div><div id="arrowList" class="list empty">Noch keine Verbindungen angelegt.</div></section>
     </aside>
     <div id="map"></div>
   </main>
   <dialog id="spotDialog"><form method="dialog" id="spotForm"><div class="dialog-head"><h2>Neuen Spot anlegen</h2><button value="cancel" class="close">×</button></div><p class="coords" id="coords"></p><label>Name<input name="name" required maxlength="100" placeholder="z. B. Alte Fabrik"></label><label>Beschreibung<textarea name="description" rows="3" maxlength="500" placeholder="Was ist dort zu sehen?"></textarea></label><label>Markerfarbe<input name="color" type="color" value="#d86b3f" title="Markerfarbe wählen"></label><div class="dialog-actions"><button value="cancel">Abbrechen</button><button class="primary" value="default">Speichern</button></div></form></dialog>
+  <dialog id="labelDialog"><form method="dialog" id="labelForm"><div class="dialog-head"><h2 id="labelDialogTitle">Beschriftung setzen</h2><button value="cancel" class="close">×</button></div><p class="coords" id="labelCoords"></p><label>Text<input name="text" required maxlength="300" placeholder="z. B. Eingang im Süden"></label><label>Textfarbe<input name="color" type="color" value="#ffffff"></label><label>Textgröße <output id="fontSizeOutput">16</output> px<input name="font_size" type="range" min="10" max="72" value="16"></label><div class="dialog-actions"><button value="cancel">Abbrechen</button><button class="primary" value="default">Speichern</button></div></form></dialog>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js" crossorigin=""></script>
   <script src="/app.js"></script>
