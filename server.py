@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sqlite3
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -33,6 +34,7 @@ def init_db():
                 description TEXT NOT NULL DEFAULT '',
                 latitude REAL NOT NULL,
                 longitude REAL NOT NULL,
+                color TEXT NOT NULL DEFAULT '#d86b3f',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
             CREATE TABLE IF NOT EXISTS arrows (
@@ -40,11 +42,16 @@ def init_db():
                 from_spot_id INTEGER NOT NULL REFERENCES spots(id) ON DELETE CASCADE,
                 to_spot_id INTEGER NOT NULL REFERENCES spots(id) ON DELETE CASCADE,
                 label TEXT NOT NULL DEFAULT '',
+                color TEXT NOT NULL DEFAULT '#d86b3f',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(from_spot_id, to_spot_id)
             );
             """
         )
+        for table in ("spots", "arrows"):
+            columns = {row[1] for row in db.execute(f"PRAGMA table_info({table})")}
+            if "color" not in columns:
+                db.execute(f"ALTER TABLE {table} ADD COLUMN color TEXT NOT NULL DEFAULT '#d86b3f'")
 
 
 def rows(sql, params=()):
@@ -65,6 +72,13 @@ def number(value, field):
         raise ValueError("latitude must be between -90 and 90")
     if field == "longitude" and not -180 <= value <= 180:
         raise ValueError("longitude must be between -180 and 180")
+    return value
+
+
+def color(value):
+    value = str(value or "").strip().lower()
+    if not re.fullmatch(r"#[0-9a-f]{6}", value):
+        raise ValueError("color must be a six-digit hexadecimal value")
     return value
 
 
@@ -123,8 +137,8 @@ class Handler(BaseHTTPRequestHandler):
                     if not name:
                         raise ValueError("name is required")
                     cursor = db.execute(
-                        "INSERT INTO spots (name, description, latitude, longitude) VALUES (?, ?, ?, ?)",
-                        (name, str(data.get("description", "")).strip(), number(data["latitude"], "latitude"), number(data["longitude"], "longitude")),
+                        "INSERT INTO spots (name, description, latitude, longitude, color) VALUES (?, ?, ?, ?, ?)",
+                        (name, str(data.get("description", "")).strip(), number(data["latitude"], "latitude"), number(data["longitude"], "longitude"), color(data.get("color", "#d86b3f"))),
                     )
                     spot_id = cursor.lastrowid
                     spot = dict(db.execute("SELECT * FROM spots WHERE id = ?", (spot_id,)).fetchone())
@@ -135,7 +149,7 @@ class Handler(BaseHTTPRequestHandler):
                     target = int(data["to_spot_id"])
                     if source == target:
                         raise ValueError("an arrow needs two different spots")
-                    cursor = db.execute("INSERT INTO arrows (from_spot_id, to_spot_id, label) VALUES (?, ?, ?)", (source, target, str(data.get("label", "")).strip()))
+                    cursor = db.execute("INSERT INTO arrows (from_spot_id, to_spot_id, label, color) VALUES (?, ?, ?, ?)", (source, target, str(data.get("label", "")).strip(), color(data.get("color", "#d86b3f"))))
                     arrow = dict(db.execute("SELECT * FROM arrows WHERE id = ?", (cursor.lastrowid,)).fetchone())
                     self.send_json(arrow, 201)
                     return
@@ -144,6 +158,25 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "This arrow already exists or references an unknown spot."}, 409)
         except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:
             self.send_json({"error": str(exc)}, 400)
+
+    def do_PATCH(self):
+        path = urlparse(self.path).path
+        try:
+            item_id = int(path.rsplit("/", 1)[1])
+            table = "spots" if path.startswith("/api/spots/") else "arrows" if path.startswith("/api/arrows/") else None
+            if not table:
+                raise KeyError(path)
+            data = body_json(self)
+            new_color = color(data["color"])
+            with connect() as db:
+                cursor = db.execute(f"UPDATE {table} SET color = ? WHERE id = ?", (new_color, item_id))
+                if cursor.rowcount == 0:
+                    self.send_json({"error": "not found"}, 404)
+                else:
+                    item = dict(db.execute(f"SELECT * FROM {table} WHERE id = ?", (item_id,)).fetchone())
+                    self.send_json(item)
+        except (KeyError, ValueError, TypeError, json.JSONDecodeError):
+            self.send_json({"error": "invalid color or item"}, 400)
 
     def do_DELETE(self):
         path = urlparse(self.path).path

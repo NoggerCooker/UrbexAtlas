@@ -20,13 +20,13 @@
         <button id="arrowModeBtn">➜ Pfeil spannen</button>
       </div>
       <div id="hint" class="hint">Klicke auf „Spot markieren“, dann auf einen Punkt der Karte.</div>
-      <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn active" type="button">Straße</button><button id="satelliteBtn" class="map-btn" type="button">Satellit</button></div><div class="color-row"><label for="markerColor">Markerfarbe</label><input id="markerColor" type="color" value="#d86b3f" title="Markerfarbe wählen"></div><div class="color-row"><label for="arrowColor">Pfeilfarbe</label><input id="arrowColor" type="color" value="#d86b3f" title="Pfeilfarbe wählen"></div></section>
+      <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn active" type="button">Straße</button><button id="satelliteBtn" class="map-btn" type="button">Satellit</button></div></section>
       <section><div class="section-title"><span>Spots</span><strong id="spotCount">0</strong></div><div id="spotList" class="list empty">Noch keine Spots angelegt.</div></section>
       <section><div class="section-title"><span>Pfeile</span><strong id="arrowCount">0</strong></div><div id="arrowList" class="list empty">Noch keine Verbindungen angelegt.</div></section>
     </aside>
     <div id="map"></div>
   </main>
-  <dialog id="spotDialog"><form method="dialog" id="spotForm"><div class="dialog-head"><h2>Neuen Spot anlegen</h2><button value="cancel" class="close">×</button></div><p class="coords" id="coords"></p><label>Name<input name="name" required maxlength="100" placeholder="z. B. Alte Fabrik"></label><label>Beschreibung<textarea name="description" rows="3" maxlength="500" placeholder="Was ist dort zu sehen?"></textarea></label><div class="dialog-actions"><button value="cancel">Abbrechen</button><button class="primary" value="default">Speichern</button></div></form></dialog>
+  <dialog id="spotDialog"><form method="dialog" id="spotForm"><div class="dialog-head"><h2>Neuen Spot anlegen</h2><button value="cancel" class="close">×</button></div><p class="coords" id="coords"></p><label>Name<input name="name" required maxlength="100" placeholder="z. B. Alte Fabrik"></label><label>Beschreibung<textarea name="description" rows="3" maxlength="500" placeholder="Was ist dort zu sehen?"></textarea></label><label>Markerfarbe<input name="color" type="color" value="#d86b3f" title="Markerfarbe wählen"></label><div class="dialog-actions"><button value="cancel">Abbrechen</button><button class="primary" value="default">Speichern</button></div></form></dialog>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js" crossorigin=""></script>
   <script src="/app.js"></script>

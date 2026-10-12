@@ -10,7 +10,7 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 - Name und Beschreibung pro Spot
 - Gerichtete Pfeile zwischen zwei Spots spannen
 - Pfeilspitzen mit gut sichtbaren, doppelt langen Schenkeln
-- Marker- und Pfeilfarbe frei über Farbwähler einstellen
+- Individuelle Marker- und Pfeilfarben mit Speicherung in SQLite
 - Spots und Pfeile dauerhaft in SQLite speichern
 - Einträge über die Seitenleiste verwalten und löschen
 - Keine externen Python-Abhängigkeiten erforderlich
@@ -75,6 +75,8 @@ UrbexAtlas/
 - `GET /api/data` – alle Spots und Pfeile laden
 - `POST /api/spots` – Spot anlegen
 - `POST /api/arrows` – Pfeil zwischen zwei Spots anlegen
+- `PATCH /api/spots/<id>` – Markerfarbe eines Spots speichern
+- `PATCH /api/arrows/<id>` – Pfeilfarbe eines Pfeils speichern
 - `DELETE /api/spots/<id>` – Spot inklusive abhängiger Pfeile löschen
 - `DELETE /api/arrows/<id>` – Pfeil löschen
 
