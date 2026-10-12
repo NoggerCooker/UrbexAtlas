@@ -1,7 +1,7 @@
 const map = L.map('map').setView([51.1657, 10.4515], 6);
 const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'});
 const satelliteTiles = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google'});
-osmTiles.addTo(map);
+satelliteTiles.addTo(map);
 const layers = {markers: new Map(), arrows: new Map()};
 let data = {spots: [], arrows: []};
 let addMode = false, arrowMode = false, arrowStart = null, pendingCoords = null;
@@ -58,4 +58,6 @@ $('spotList').addEventListener('change', async e => { const id = e.target.datase
 $('arrowList').addEventListener('change', async e => { const id = e.target.dataset.colorArrow; if (id) { await api(`/api/arrows/${id}`, {method:'PATCH', body:JSON.stringify({color:e.target.value})}); reload(); } });
 $('osmBtn').onclick = () => setTileLayer(osmTiles, $('osmBtn'));
 $('satelliteBtn').onclick = () => setTileLayer(satelliteTiles, $('satelliteBtn'));
+$('mobileMenuBtn').onclick = () => { const open = $('sidebar').classList.toggle('open'); $('mobileMenuBtn').setAttribute('aria-expanded', open); $('mobileMenuBtn').textContent = open ? '×' : '☰'; };
+document.querySelectorAll('.sidebar button').forEach(button => button.addEventListener('click', () => { if (window.matchMedia('(max-width: 760px)').matches && button.id !== 'mobileMenuBtn') { $('sidebar').classList.remove('open'); $('mobileMenuBtn').setAttribute('aria-expanded', 'false'); $('mobileMenuBtn').textContent = '☰'; } }));
 reload().catch(() => { $('statusText').textContent = 'Backend nicht erreichbar'; document.querySelector('.dot').style.background = '#d86b3f'; });

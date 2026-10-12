@@ -4,8 +4,10 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 
 ## Funktionen
 
+- Google-Satellitenansicht als Standardkarte
 - Interaktive Karte auf Basis von [Leaflet](https://leafletjs.com/)
 - Zwischen OpenStreetMap-Straßenkarte und Google-Satellitenansicht umschalten
+- Mobile Ansicht mit ausklappbarer Seitenleiste
 - Spots direkt per Kartenklick anlegen
 - Name und Beschreibung pro Spot
 - Gerichtete Pfeile zwischen zwei Spots spannen
@@ -56,6 +58,10 @@ PORT=9000 python3 server.py
 5. Zuerst den Startspot, danach den Zielspot anklicken.
 
 Die Datenbank `lost_place_map.sqlite3` wird beim ersten Start automatisch mit den Tabellen `spots` und `arrows` angelegt.
+
+## Mobile Bedienung
+
+Auf Bildschirmbreiten bis 760 Pixel wird die Seitenleiste standardmäßig ausgeblendet und die Karte nutzt die gesamte verfügbare Fläche. Über das Menü-Symbol oben links wird die Seitenleiste eingeblendet. Nach Auswahl einer Aktion schließt sie sich wieder, damit die Karte vollständig bedienbar bleibt.
 
 ## Projektstruktur
 

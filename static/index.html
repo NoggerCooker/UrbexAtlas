@@ -9,18 +9,19 @@
 </head>
 <body>
   <header class="topbar">
-    <div><span class="eyebrow">URBEX ATLAS</span><h1>New Lost Place Map</h1></div>
+    <button id="mobileMenuBtn" class="mobile-menu" type="button" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+    <div><span class="eyebrow">URBEX ATLAS</span><h1>UrbexAtlas</h1></div>
     <div class="status"><span class="dot"></span><span id="statusText">Verbunden</span></div>
   </header>
   <main class="layout">
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
       <section class="intro"><h2>Spots verbinden</h2><p>Setze Marker auf der Karte und verbinde sie mit gerichteten Pfeilen.</p></section>
       <div class="actions">
         <button id="addSpotBtn" class="primary">＋ Spot markieren</button>
         <button id="arrowModeBtn">➜ Pfeil spannen</button>
       </div>
       <div id="hint" class="hint">Klicke auf „Spot markieren“, dann auf einen Punkt der Karte.</div>
-      <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn active" type="button">Straße</button><button id="satelliteBtn" class="map-btn" type="button">Satellit</button></div></section>
+      <section class="settings"><div class="section-title"><span>Kartendarstellung</span></div><div class="tile-switch" role="group" aria-label="Kartendarstellung"><button id="osmBtn" class="map-btn" type="button">Straße</button><button id="satelliteBtn" class="map-btn active" type="button">Satellit</button></div></section>
       <section><div class="section-title"><span>Spots</span><strong id="spotCount">0</strong></div><div id="spotList" class="list empty">Noch keine Spots angelegt.</div></section>
       <section><div class="section-title"><span>Pfeile</span><strong id="arrowCount">0</strong></div><div id="arrowList" class="list empty">Noch keine Verbindungen angelegt.</div></section>
     </aside>
