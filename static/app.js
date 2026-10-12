@@ -1,4 +1,19 @@
-const map = L.map('map').setView([51.1657, 10.4515], 6);
+function readMapViewCookie() {
+  const raw = document.cookie.split('; ').find(item => item.startsWith('urbexatlas-map-view='))?.split('=')[1];
+  if (!raw) return null;
+  try {
+    const view = JSON.parse(decodeURIComponent(raw));
+    if (Number.isFinite(view.lat) && Number.isFinite(view.lng) && Number.isFinite(view.zoom)) return view;
+  } catch (_) {}
+  return null;
+}
+function saveMapViewCookie() {
+  const center = map.getCenter();
+  const view = {lat: Number(center.lat.toFixed(7)), lng: Number(center.lng.toFixed(7)), zoom: map.getZoom()};
+  document.cookie = `urbexatlas-map-view=${encodeURIComponent(JSON.stringify(view))}; Max-Age=31536000; Path=/; SameSite=Lax`;
+}
+const savedMapView = readMapViewCookie();
+const map = L.map('map').setView(savedMapView ? [savedMapView.lat, savedMapView.lng] : [51.1657, 10.4515], savedMapView?.zoom ?? 6);
 const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'});
 const satelliteTiles = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google'});
 satelliteTiles.addTo(map);
@@ -9,6 +24,7 @@ const $ = id => document.getElementById(id);
 function makeSpotIcon(colorValue) { return L.divIcon({className: 'spot-marker', html: `<span style="background:${colorValue || '#d86b3f'}"></span>`, iconSize: [16,16], iconAnchor: [8,8]}); }
 function makeLabelIcon(label) { return L.divIcon({className: 'map-label', html: `<span style="color:${label.color || '#ffffff'};font-size:${label.font_size || 16}px">${esc(label.text)}</span>`, iconSize: null, iconAnchor: [0, 0]}); }
 function setTileLayer(layer, activeButton) { map.eachLayer(item => { if (item === osmTiles || item === satelliteTiles) map.removeLayer(item); }); layer.addTo(map); document.querySelectorAll('.map-btn').forEach(button => button.classList.remove('active')); activeButton.classList.add('active'); }
+map.on('moveend', saveMapViewCookie);
 
 async function api(path, options = {}) {
   const res = await fetch(path, {headers: {'Content-Type': 'application/json'}, ...options});

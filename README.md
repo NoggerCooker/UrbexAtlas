@@ -8,6 +8,7 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 - Interaktive Karte auf Basis von [Leaflet](https://leafletjs.com/)
 - Zwischen OpenStreetMap-Straßenkarte und Google-Satellitenansicht umschalten
 - Mobile Ansicht mit ausklappbarer Seitenleiste
+- Kartenposition und Zoom pro Browsergerät in einem Cookie merken
 - Spots direkt per Kartenklick anlegen
 - Schwebende Beschriftungen an geografischen Positionen platzieren
 - Beschriftungen per Drag-and-drop verschieben und per Klick bearbeiten
@@ -65,6 +66,10 @@ PORT=9000 python3 server.py
 Beschriftungen lassen sich direkt auf der Karte verschieben. Ein Klick auf den Text öffnet den Bearbeitungsdialog. Alle Beschriftungen werden in der SQLite-Tabelle `labels` gespeichert.
 
 Die Datenbank `lost_place_map.sqlite3` wird beim ersten Start automatisch mit den Tabellen `spots`, `arrows` und `labels` angelegt.
+
+## Kartenposition speichern
+
+Die aktuelle Kartenmitte und Zoomstufe werden bei jeder Kartenbewegung im Cookie `urbexatlas-map-view` gespeichert. Das Cookie gilt ein Jahr, ist auf den Seitenpfad `/` begrenzt und wird beim nächsten Laden derselben Browserinstanz automatisch wieder verwendet. Es werden keine Kartendaten auf dem Server dafür gespeichert.
 
 ## Mobile Bedienung
 
