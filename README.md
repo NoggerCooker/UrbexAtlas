@@ -12,6 +12,7 @@ Eine lokale Webanwendung zum Erfassen und Verbinden von Lost-Place-Spots auf ein
 - Spots direkt per Kartenklick anlegen
 - Schwebende Beschriftungen an geografischen Positionen platzieren
 - Beschriftungen per Drag-and-drop verschieben und per Klick bearbeiten
+- Beschriftungen sind an Koordinaten gebunden und skalieren beim Zoomen wie eine Kartenfläche
 - Textfarbe und Textgröße pro Beschriftung einstellen
 - Name und Beschreibung pro Spot
 - Gerichtete Pfeile zwischen zwei Spots spannen
@@ -63,7 +64,7 @@ PORT=9000 python3 server.py
 6. Für eine Verbindung **Pfeil spannen** auswählen.
 7. Zuerst den Startspot, danach den Zielspot anklicken.
 
-Beschriftungen lassen sich direkt auf der Karte verschieben. Ein Klick auf den Text öffnet den Bearbeitungsdialog. Alle Beschriftungen werden in der SQLite-Tabelle `labels` gespeichert.
+Beschriftungen lassen sich direkt auf der Karte verschieben. Ein Klick auf den Text öffnet den Bearbeitungsdialog. Die gespeicherte Textgröße gilt bei Zoomstufe 14 als Referenz und wird beim Hinein- bzw. Herauszoomen proportional angepasst. Alle Beschriftungen werden in der SQLite-Tabelle `labels` gespeichert.
 
 Die Datenbank `lost_place_map.sqlite3` wird beim ersten Start automatisch mit den Tabellen `spots`, `arrows` und `labels` angelegt.
 

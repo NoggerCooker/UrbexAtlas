@@ -22,9 +22,12 @@ let data = {spots: [], arrows: [], labels: []};
 let addMode = false, arrowMode = false, labelMode = false, arrowStart = null, pendingCoords = null;
 const $ = id => document.getElementById(id);
 function makeSpotIcon(colorValue) { return L.divIcon({className: 'spot-marker', html: `<span style="background:${colorValue || '#d86b3f'}"></span>`, iconSize: [16,16], iconAnchor: [8,8]}); }
-function makeLabelIcon(label) { return L.divIcon({className: 'map-label', html: `<span style="color:${label.color || '#ffffff'};font-size:${label.font_size || 16}px">${esc(label.text)}</span>`, iconSize: null, iconAnchor: [0, 0]}); }
+const LABEL_BASE_ZOOM = 14;
+function labelFontSize(label) { return Math.max(4, Math.min(160, label.font_size * map.getZoomScale(map.getZoom(), LABEL_BASE_ZOOM))); }
+function makeLabelIcon(label) { return L.divIcon({className: 'map-label', html: `<span style="color:${label.color || '#ffffff'};font-size:${labelFontSize(label)}px">${esc(label.text)}</span>`, iconSize: null, iconAnchor: [0, 0]}); }
 function setTileLayer(layer, activeButton) { map.eachLayer(item => { if (item === osmTiles || item === satelliteTiles) map.removeLayer(item); }); layer.addTo(map); document.querySelectorAll('.map-btn').forEach(button => button.classList.remove('active')); activeButton.classList.add('active'); }
 map.on('moveend', saveMapViewCookie);
+map.on('zoomend', render);
 
 async function api(path, options = {}) {
   const res = await fetch(path, {headers: {'Content-Type': 'application/json'}, ...options});
